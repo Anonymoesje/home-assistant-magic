@@ -31,7 +31,7 @@ elif command -v "pacman" &>/dev/null; then
     PACKMANAGER="pacman"
 fi
 
-contains_wazuh="$(echo "$PACKAGES" | grep -q "wazuh-agent")"
+#contains_wazuh="$(echo "$PACKAGES" | grep -q "wazuh-agent")"
 
 # if [ -n "$apkBased" ] && [ -n "$contains_wazuh" ]; then
 #     wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub
@@ -177,12 +177,12 @@ for files in "/etc/cont-init.d" "/etc/services.d"; do
         [ "$PACKMANAGER" = "pacman" ] && PACKAGES="$PACKAGES wget"
     fi
 
-    COMMAND="wazuh-agent"
-    if grep -q -rnw "$files/" -e "$COMMAND" && ! command -v $COMMAND &>/dev/null; then
-        [ "$VERBOSE" = true ] && echo "$COMMAND required"
-        [ "$PACKMANAGER" = "apk" ] && PACKAGES="$PACKAGES wazuh-agent"
-        [ "$PACKMANAGER" = "apt" ] && PACKAGES="$PACKAGES wazuh-agent"
-    fi
+    # COMMAND="wazuh-agent"
+    # if grep -q -rnw "$files/" -e "$COMMAND" && ! command -v $COMMAND &>/dev/null; then
+    #     [ "$VERBOSE" = true ] && echo "$COMMAND required"
+    #     [ "$PACKMANAGER" = "apk" ] && PACKAGES="$PACKAGES wazuh-agent"
+    #     [ "$PACKMANAGER" = "apt" ] && PACKAGES="$PACKAGES wazuh-agent"
+    # fi
 
 done
 
