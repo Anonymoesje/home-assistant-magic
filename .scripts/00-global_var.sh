@@ -59,16 +59,4 @@ for KEYS in "${arr[@]}"; do
     # For s6
     if [ -d /var/run/s6/container_environment ]; then printf "%s" "${VALUE}" > /var/run/s6/container_environment/"${KEYS}"; fi
     echo "export ${KEYS}='${VALUE}'" >> ~/.bashrc
-
 done
-
-################
-# Set timezone #
-################
-set +e
-if [ -n "$TZ" ] && [ -f /etc/localtime ]; then
-    if [ -f /usr/share/zoneinfo/"$TZ" ]; then
-        echo "Timezone set from $(cat /etc/timezone) to $TZ"
-        ln -snf /usr/share/zoneinfo/"$TZ" /etc/localtime && echo "$TZ" >/etc/timezone
-    fi
-fi
