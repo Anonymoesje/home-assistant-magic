@@ -12,6 +12,10 @@ ENV \
     S6_CMD_WAIT_FOR_SERVICES=1 \
     S6_SERVICES_READYTIME=50
 
+ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_lsio.sh" "/ha_lsio.sh"
+ARG CONFIGLOCATION="/config/addons_config/wh-agent"
+RUN chmod 744 /ha_lsio.sh && if grep -qr "lsio" /etc; then /ha_lsio.sh "$CONFIGLOCATION"; fi && rm /ha_lsio.sh
+
 COPY rootfs/ /
 
 ARG CONFIG_LOCATION="/config/addons_config"
@@ -36,5 +40,3 @@ ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.sc
 ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_entrypoint_modif.sh" "/ha_entrypoint_modif.sh"
 RUN chmod 777 /ha_entrypoint.sh /ha_entrypoint_modif.sh && /ha_entrypoint_modif.sh && rm /ha_entrypoint_modif.sh
 
-ENTRYPOINT [ "/usr/bin/env" ]
-CMD [ "/ha_entrypoint.sh" ]

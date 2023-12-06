@@ -27,4 +27,4 @@ bashio::log.info "WAZUH_MANAGER: ${WAZUH_MANAGER}"
 
 bashio::log.info "Service starting"
 cd /var/ossec/bin || bashio::exit.nok
-exec ./wazuh-control start
+./wazuh-control start
