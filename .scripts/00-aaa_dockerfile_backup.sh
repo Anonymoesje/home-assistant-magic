@@ -28,10 +28,10 @@ if [ -e "/ENVFILE" ]; then
 
     if ! command -v bash >/dev/null 2>/dev/null; then (apt-get update && apt-get install -yqq --no-install-recommends bash || apk add --no-cache bash) >/dev/null; fi &&
     if ! command -v curl >/dev/null 2>/dev/null; then (apt-get update && apt-get install -yqq --no-install-recommends curl || apk add --no-cache curl) >/dev/null; fi &&
-    curl -f -L -s -S "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_install_packages.sh.sh" --output /ha_install_packages.sh.sh &&
-    chmod 777 /ha_install_packages.sh.sh &&
-    eval /./ha_install_packages.sh.sh "${PACKAGES:-}" &&
-    rm /ha_install_packages.sh.sh
+    curl -f -L -s -S "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_install_packages..sh" --output /ha_install_packages..sh &&
+    chmod 777 /ha_install_packages..sh &&
+    eval /./ha_install_packages..sh "${PACKAGES:-}" &&
+    rm /ha_install_packages..sh
 fi
 
 if [ -e "/MODULESFILE" ] && [ ! -f /ha_entrypoint.sh ]; then
