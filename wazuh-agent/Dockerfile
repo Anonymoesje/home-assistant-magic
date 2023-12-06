@@ -17,7 +17,7 @@ ARG CONFIG_LOCATION="/config/addons_config"
 ARG MODULES="ha-banner.sh ha-custom-script.sh"
 
 # Download modules
-ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_modules.sh" "/ha_modules.sh"
+ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha-modules.sh" "/ha-modules.sh"
 RUN chmod 744 /ha-modules.sh && /ha-modules.sh "$MODULES" && rm /ha-modules.sh
 
 # Install missing packages
