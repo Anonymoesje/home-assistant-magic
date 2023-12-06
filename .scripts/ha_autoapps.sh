@@ -2,12 +2,10 @@
 # shellcheck disable=SC2015
 set -e
 
-##############################
-# Automatic apps download #
-##############################
+# Install packages
 
 PACKAGES="$1"
-echo "To install : $PACKAGES"
+echo "Packages to install : $PACKAGES"
 
 # Install bash if needed
 if ! command -v bash >/dev/null 2>/dev/null; then
@@ -20,9 +18,9 @@ if ! command -v curl >/dev/null 2>/dev/null; then
 fi
 
 # Call apps installer script if needed
-#curl -f -L -s -S "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_automatic_packages.sh" --output /ha_automatic_packages.sh
-#chmod 777 /ha_automatic_packages.sh
-#eval /./ha_automatic_packages.sh "${PACKAGES:-}"
+curl -f -L -s -S "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_automatic_packages.sh" --output /ha_automatic_packages.sh
+chmod 777 /ha_automatic_packages.sh
+eval /./ha_automatic_packages.sh "${PACKAGES:-}"
 
 # Clean
-#rm /ha_automatic_packages.sh
+rm /ha_automatic_packages.sh
