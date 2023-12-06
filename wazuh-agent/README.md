@@ -2,6 +2,7 @@
 
 _Add-on to add a wazuh-agent to Home Assistant._
 
+[![Donate][donation-badge]](https://www.buymeacoffee.com/Anonymoesje)
 ![Supports aarch64 Architecture][aarch64-shield]
 ![Supports amd64 Architecture][amd64-shield]
 ![Supports armhf Architecture][armhf-shield]
