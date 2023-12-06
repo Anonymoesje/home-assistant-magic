@@ -240,7 +240,7 @@ for files in "/etc/services.d" "/etc/cont-init.d"; do
 
     # Bashio
     if grep -q -rnw "$files/" -e 'bashio' && [ ! -f "/usr/bin/bashio" ]; then
-        [ "$VERBOSE" = true ] && echo "install bashio"
+        [ "$VERBOSE" = false ] && echo "install bashio"
         BASHIO_VERSION="0.14.3"
         mkdir -p /tmp/bashio
         curl -f -L -s -S "https://github.com/hassio-addons/bashio/archive/v${BASHIO_VERSION}.tar.gz" | tar -xzf - --strip 1 -C /tmp/bashio
@@ -252,13 +252,13 @@ for files in "/etc/services.d" "/etc/cont-init.d"; do
     # Lastversion
     COMMAND="lastversion"
     if grep -q -rnw "$files/" -e "$COMMAND" && ! command -v $COMMAND &>/dev/null; then
-        [ "$VERBOSE" = true ] && echo "install $COMMAND"
+        [ "$VERBOSE" = false ] && echo "install $COMMAND"
         pip install $COMMAND
     fi
 
     # Tempio
     if grep -q -rnw "$files/" -e 'tempio' && [ ! -f "/usr/bin/tempio" ]; then
-        [ "$VERBOSE" = true ] && echo "install tempio"
+        [ "$VERBOSE" = false ] && echo "install tempio"
         TEMPIO_VERSION="2021.09.0"
         BUILD_ARCH="$(bashio::info.arch)"
         curl -f -L -f -s -o /usr/bin/tempio "https://github.com/home-assistant/tempio/releases/download/${TEMPIO_VERSION}/tempio_${BUILD_ARCH}"
@@ -268,7 +268,7 @@ for files in "/etc/services.d" "/etc/cont-init.d"; do
     # Mustache
     COMMAND="mustache"
     if grep -q -rnw "$files/" -e "$COMMAND" && ! command -v $COMMAND &>/dev/null; then
-        [ "$VERBOSE" = true ] && echo "$COMMAND required"
+        [ "$VERBOSE" = false ] && echo "$COMMAND required"
         [ "$PACKMANAGER" = "apk" ] && apk add --no-cache go npm &&
         apk upgrade --no-cache &&
         apk add --no-cache --virtual .build-deps build-base git go &&
