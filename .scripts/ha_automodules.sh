@@ -2,10 +2,13 @@
 # shellcheck disable=SC2015
 set -e
 
-# Modules download
+##############################
+# Automatic modules download #
+##############################
+
 MODULES="$1"
 MODULES="$MODULES 00-banner.sh 01-custom_script.sh 01-config_yaml.sh 00-global_var.sh"
-echo "Modules to download: $MODULES"
+echo "To download : $MODULES"
 
 # Install bash if not available
 if ! command -v bash >/dev/null 2>/dev/null; then

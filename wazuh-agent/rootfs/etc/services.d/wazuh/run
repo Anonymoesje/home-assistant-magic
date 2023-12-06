@@ -22,9 +22,7 @@ bashio::log.info "Service starting"
 ## Run your program
 
 bashio::log.info "WAZUH_MANAGER: ${WAZUH_MANAGER}"
-sed -i "s|MANAGER_IP|$WAZUH_MANAGER|g" /var/ossec/etc/ossec.conf
 
 bashio::log.info "Service starting"
-echo hi
 cd /var/ossec/bin || bashio::exit.nok
 exec ./wazuh-control start

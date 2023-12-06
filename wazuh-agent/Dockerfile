@@ -1,6 +1,8 @@
 ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
+SHELL ["/bin/bash", "-c"]
+
 # Default ENV
 ENV \
     LANG="C.UTF-8" \
@@ -13,73 +15,37 @@ ENV \
 COPY rootfs/ /
 
 ARG CONFIG_LOCATION="/config/addons_config"
+ARG MODULES="00-banner.sh 01-custom_script.sh 00-global_var.sh"
 
-ARG MODULES="ha-banner.sh ha-custom-script.sh"
+# Automatic modules download
+ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_automodules.sh" "/ha_automodules.sh"
+RUN chmod 744 /ha_automodules.sh && /ha_automodules.sh "$MODULES" && rm /ha_automodules.sh
 
-# Download modules
-ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha-modules.sh" "/ha-modules.sh"
-RUN chmod 744 /ha-modules.sh && /ha-modules.sh "$MODULES" && rm /ha-modules.sh
-
-# Install missing packages
-ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha-packages.sh" "/ha-packages.sh"
-RUN chmod 744 /ha-packages.sh && /ha-packages.sh "$MODULES" && rm /ha-packages.sh
-
-ENV PACKAGES="curl"
-
-# Version
-ARG \
-    BASHIO_VERSION \
-    TEMPIO_VERSION \
-    S6_OVERLAY_VERSION
-
-# Base system
-WORKDIR /usr/src
-ARG BUILD_ARCH
+# Manual apps
+ENV PACKAGES="jq curl iproute2"
 
 RUN \
-    set -x \
-    && apt-get update && apt-get install -y --no-install-recommends \
-        bash \
-        jq \
-        tzdata \
-        curl \
-        ca-certificates \
-        xz-utils \
-    \
-    && if [ "${BUILD_ARCH}" = "armv7" ]; then \
-            export S6_ARCH="arm"; \
-        elif [ "${BUILD_ARCH}" = "i386" ]; then \
-            export S6_ARCH="i686"; \
-        elif [ "${BUILD_ARCH}" = "amd64" ]; then \
-            export S6_ARCH="x86_64"; \
-        else \
-            export S6_ARCH="${BUILD_ARCH}"; \
-        fi \
-    \
-    && curl -L -f -s "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${S6_ARCH}.tar.xz" \
-        | tar Jxvf - -C / \
-    && curl -L -f -s "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" \
-        | tar Jxvf - -C / \
-    && curl -L -f -s "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-arch.tar.xz" \
-        | tar Jxvf - -C / \
-    && curl -L -f -s "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-symlinks-noarch.tar.xz" \
-        | tar Jxvf - -C / \
-    && mkdir -p /etc/fix-attrs.d \
-    && mkdir -p /etc/services.d \
-    \
-    && curl -L -f -s -o /usr/bin/tempio \
-        "https://github.com/home-assistant/tempio/releases/download/${TEMPIO_VERSION}/tempio_${BUILD_ARCH}" \
-    && chmod a+x /usr/bin/tempio \
-    \
-    && mkdir -p /usr/src/bashio \
-    && curl -L -f -s "https://github.com/hassio-addons/bashio/archive/v${BASHIO_VERSION}.tar.gz" \
-        | tar -xzf - --strip 1 -C /usr/src/bashio \
-    && mv /usr/src/bashio/lib /usr/lib/bashio \
-    && ln -s /usr/lib/bashio/bashio /usr/bin/bashio \
-    \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /usr/src/*
+  curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && chmod 644 /usr/share/keyrings/wazuh.gpg \
+  echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list \
+  apt-get update \
+  apt-get install wazuh-agent
 
-# S6-Overlay
-WORKDIR /
-ENTRYPOINT ["/init"]
+# Automatic apps & bashio
+ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_autoapps.sh" "/ha_autoapps.sh"
+RUN chmod 744 /ha_autoapps.sh && /ha_autoapps.sh "$PACKAGES" && rm /ha_autoapps.sh
+
+################
+# 4 Entrypoint #
+################
+
+# Add entrypoint
+ENV S6_STAGE2_HOOK=/ha_entrypoint.sh
+ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_entrypoint.sh" "/ha_entrypoint.sh"
+
+# Entrypoint modifications
+ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_entrypoint_modif.sh" "/ha_entrypoint_modif.sh"
+RUN chmod 777 /ha_entrypoint.sh /ha_entrypoint_modif.sh && /ha_entrypoint_modif.sh && rm /ha_entrypoint_modif.sh
+
+
+ENTRYPOINT [ "/usr/bin/env" ]
+CMD [ "/ha_entrypoint.sh" ]

@@ -1,9 +1,8 @@
 #!/usr/bin/with-contenv bashio
 # shellcheck shell=bash
 set -e
-
 # ==============================================================================
-# Startup banner
+# Displays a simple add-on banner on startup
 # ==============================================================================
 if bashio::supervisor.ping; then
     bashio::log.blue \
