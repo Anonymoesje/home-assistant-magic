@@ -17,13 +17,11 @@ PACKAGES="${*:-}"
 [ "$VERBOSE" = true ] && echo "ENV : $PACKAGES"
 
 # Prepare manager-base variable
-apkBased="$(command -v "apk" &>/dev/null)"
-aptBased="$(command -v "apt" &>/dev/null)"
-if [ -n "$apkBased" ]; then
+if command -v "apk" &>/dev/null; then
     # If apk based
     [ "$VERBOSE" = true ] && echo "apk based"
     PACKMANAGER="apk"
-elif [ -n "$aptBased" ]; then
+elif command -v "apt" &>/dev/null; then
     # If apt-get based
     [ "$VERBOSE" = true ] && echo "apt based"
     PACKMANAGER="apt"
@@ -35,15 +33,15 @@ fi
 
 contains_wazuh="$(echo "$PACKAGES" | grep -q "wazuh-agent")"
 
-if [ -n "$apkBased" ] && [ -n "$contains_wazuh" ]; then
-    wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub
-    echo "https://packages.wazuh.com/4.x/alpine/v3.12/main" >> /etc/apk/repositories
-    apk update
-elif [ -n "$aptBased" ] && [ -n "$contains_wazuh" ]; then
-    curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && chmod 644 /usr/share/keyrings/wazuh.gpg
-    echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list
-    apt-get update
-fi
+# if [ -n "$apkBased" ] && [ -n "$contains_wazuh" ]; then
+#     wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub
+#     echo "https://packages.wazuh.com/4.x/alpine/v3.12/main" >> /etc/apk/repositories
+#     apk update
+# elif [ -n "$aptBased" ] && [ -n "$contains_wazuh" ]; then
+#     curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && chmod 644 /usr/share/keyrings/wazuh.gpg
+#     echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list
+#     apt-get update
+# fi
 
 
 # DEFINE PACKAGES
