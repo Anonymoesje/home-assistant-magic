@@ -17,8 +17,8 @@ PACKAGES="${*:-}"
 [ "$VERBOSE" = true ] && echo "ENV : $PACKAGES"
 
 # Prepare manager-base variable
-apkBased=$(command -v "apk" &>/dev/null)
-aptBased=$(command -v "apt" &>/dev/null)
+apkBased="$(command -v "apk" &>/dev/null)"
+aptBased="$(command -v "apt" &>/dev/null)"
 if [ -n "$apkBased" ]; then
     # If apk based
     [ "$VERBOSE" = true ] && echo "apk based"
@@ -33,7 +33,7 @@ elif command -v "pacman" &>/dev/null; then
     PACKMANAGER="pacman"
 fi
 
-contains_wazuh=$(echo "$PACKAGES" | grep -q "wazuh-agent")
+contains_wazuh="$(echo "$PACKAGES" | grep -q "wazuh-agent")"
 
 if [ -n "$apkBased" ] && [ -n "$contains_wazuh" ]; then
     wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub
