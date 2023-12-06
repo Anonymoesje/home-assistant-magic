@@ -20,6 +20,6 @@ ports_description:
   1514/tcp: "Agent connection service"
   1515/tcp: "Agent enrollment service"
 options:
-  managerip: "192.168.68.106"
+  managerip: "192.168.0.1"
 schema:
   managerip: "str?"

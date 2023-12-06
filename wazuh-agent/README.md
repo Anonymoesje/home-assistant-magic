@@ -1,6 +1,6 @@
 # Home Assistant Add-on: Wazuh Agent
 
-_Example add-on to use as a blueprint for new add-ons._
+_Add-on to add a wazuh-agent to Home Assistant._
 
 ![Supports aarch64 Architecture][aarch64-shield]
 ![Supports amd64 Architecture][amd64-shield]
