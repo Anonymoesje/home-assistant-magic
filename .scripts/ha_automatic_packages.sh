@@ -16,15 +16,14 @@ PACKAGES="${*:-}"
 
 [ "$VERBOSE" = true ] && echo "ENV : $PACKAGES"
 
-############################
-# CHECK WHICH BASE IS USED #
-############################
-
-if command -v "apk" &>/dev/null; then
+# Prepare manager-base variable
+apkBased=$(command -v "apk")
+aptBased=$(command -v "apt")
+if [ -n "$apkBased" ]&>/dev/null; then
     # If apk based
     [ "$VERBOSE" = true ] && echo "apk based"
     PACKMANAGER="apk"
-elif command -v "apt" &>/dev/null; then
+elif [ -n "$aptBased" ]&>/dev/null; then
     # If apt-get based
     [ "$VERBOSE" = true ] && echo "apt based"
     PACKMANAGER="apt"
@@ -34,18 +33,25 @@ elif command -v "pacman" &>/dev/null; then
     PACKMANAGER="pacman"
 fi
 
-###################
-# DEFINE PACKAGES #
-###################
+contains_wazuh=$(echo "$PACKAGES" | grep -q "wazuh-agent")
+
+if [ -n "$apkBased" ] && [ -n "$contains_wazuh" ]; then
+    wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub
+    echo "https://packages.wazuh.com/4.x/alpine/v3.12/main" >> /etc/apk/repositories
+    apk update
+elif [ -n "$aptBased" ] && [ -n "$contains_wazuh" ]; then
+    curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && chmod 644 /usr/share/keyrings/wazuh.gpg
+    echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list
+    apt-get update
+fi
+
+
+# DEFINE PACKAGES
 
 # ADD GENERAL ELEMENTS
-######################
-
 PACKAGES="$PACKAGES jq curl vim ca-certificates"
 
 # FOR EACH SCRIPT, SELECT PACKAGES
-##################################
-
 # Scripts
 for files in "/etc/cont-init.d" "/etc/services.d"; do
     # Next directory if does not exists
@@ -170,14 +176,20 @@ for files in "/etc/cont-init.d" "/etc/services.d"; do
         [ "$VERBOSE" = true ] && echo "$COMMAND required"
         [ "$PACKMANAGER" = "apk" ] && PACKAGES="$PACKAGES wget"
         [ "$PACKMANAGER" = "apt" ] && PACKAGES="$PACKAGES wget"
-        [ "$PACKMANAGER" = "wget" ] && PACKAGES="$PACKAGES wget"
+        [ "$PACKMANAGER" = "pacman" ] && PACKAGES="$PACKAGES wget"
+    fi
+
+    COMMAND="wazuh-agent"
+    if grep -q -rnw "$files/" -e "$COMMAND" && ! command -v $COMMAND &>/dev/null; then
+        [ "$VERBOSE" = true ] && echo "$COMMAND required"
+        [ "$PACKMANAGER" = "apk" ] && PACKAGES="$PACKAGES wazuh-agent"
+        [ "$PACKMANAGER" = "apt" ] && PACKAGES="$PACKAGES wazuh-agent"
     fi
 
 done
 
-####################
-# INSTALL ELEMENTS #
-####################
+
+# INSTALL ELEMENTS
 
 # Install apps
 [ "$VERBOSE" = true ] && echo "installing packages $PACKAGES"
@@ -186,16 +198,16 @@ if [ "$PACKMANAGER" = "pacman" ]; then pacman -Sy >/dev/null; fi
 
 # Install apps one by one to allow failures
 # shellcheck disable=SC2086
-for packagestoinstall in $PACKAGES; do
-    [ "$VERBOSE" = true ] && echo "... $packagestoinstall"
+for packagelist in $PACKAGES; do
+    [ "$VERBOSE" = true ] && echo "... $packagelist"
     if [ "$PACKMANAGER" = "apk" ]; then
-        apk add --no-cache "$packagestoinstall" &>/dev/null || (echo "Error : $packagestoinstall not found" && touch /ERROR)
+        apk add --no-cache "$packagelist" &>/dev/null || (echo "Error : $packagelist not found" && touch /ERROR)
     elif [ "$PACKMANAGER" = "apt" ]; then
-        apt-get install -yqq --no-install-recommends "$packagestoinstall" &>/dev/null || (echo "Error : $packagestoinstall not found" && touch /ERROR)
+        apt-get install -yqq --no-install-recommends "$packagelist" &>/dev/null || (echo "Error : $packagelist not found" && touch /ERROR)
     elif [ "$PACKMANAGER" = "pacman" ]; then
-        pacman --noconfirm -S "$packagestoinstall" &>/dev/null || (echo "Error : $packagestoinstall not found" && touch /ERROR)
+        pacman --noconfirm -S "$packagelist" &>/dev/null || (echo "Error : $packagelist not found" && touch /ERROR)
     fi
-    [ "$VERBOSE" = true ] && echo "... $packagestoinstall done"
+    [ "$VERBOSE" = true ] && echo "... $packagelist done"
 done
 
 # Clean after install

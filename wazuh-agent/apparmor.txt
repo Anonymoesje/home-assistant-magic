@@ -31,6 +31,7 @@ profile wazuh-agent flags=(attach_disconnected,mediate_deleted) {
   /package/** ix,
   /command/** ix,
   /run/{,**} rwk,
+  /var/ossec/** rwk,
   /dev/tty rw,
   /bin/** ix,
   /usr/bin/** ix,

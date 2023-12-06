@@ -18,6 +18,8 @@ MANAGER_IP=$(bashio::config 'managerip')
 export DATA_FOLDER=/data
 export WAZUH_MANAGER=${MANAGER_IP}
 
+sed -i "s|MANAGER_IP|$WAZUH_MANAGER|g" /var/ossec/etc/ossec.conf
+
 bashio::log.info "Service starting"
 ## Run your program
 
