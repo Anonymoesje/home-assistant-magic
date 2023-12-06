@@ -31,22 +31,17 @@ elif command -v "pacman" &>/dev/null; then
     PACKMANAGER="pacman"
 fi
 
+
+# Check wazuh package known, if present.
 if command -v "apk" &>/dev/null && echo "$PACKAGES" | grep "wazuh-agent" >/dev/null; then
      curl -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub
      echo "https://packages.wazuh.com/4.x/alpine/v3.12/main" >> /etc/apk/repositories
      apk update
+elif command -v "apt" &>/dev/null && echo "$PACKAGES" | grep "wazuh-agent" >/dev/null; then
+    curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && chmod 644 /usr/share/keyrings/wazuh.gpg
+    echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list
+    apt-get update
 fi
-
-# if [ -n "$apkBased" ] && [ -n "$contains_wazuh" ]; then
-#     wget -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub
-#     echo "https://packages.wazuh.com/4.x/alpine/v3.12/main" >> /etc/apk/repositories
-#     apk update
-# elif [ -n "$aptBased" ] && [ -n "$contains_wazuh" ]; then
-#     curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | gpg --no-default-keyring --keyring gnupg-ring:/usr/share/keyrings/wazuh.gpg --import && chmod 644 /usr/share/keyrings/wazuh.gpg
-#     echo "deb [signed-by=/usr/share/keyrings/wazuh.gpg] https://packages.wazuh.com/4.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list
-#     apt-get update
-# fi
-
 
 # DEFINE PACKAGES
 
@@ -181,12 +176,12 @@ for files in "/etc/cont-init.d" "/etc/services.d"; do
         [ "$PACKMANAGER" = "pacman" ] && PACKAGES="$PACKAGES wget"
     fi
 
-    # COMMAND="wazuh-agent"
-    # if grep -q -rnw "$files/" -e "$COMMAND" && ! command -v $COMMAND &>/dev/null; then
-    #     [ "$VERBOSE" = true ] && echo "$COMMAND required"
-    #     [ "$PACKMANAGER" = "apk" ] && PACKAGES="$PACKAGES wazuh-agent"
-    #     [ "$PACKMANAGER" = "apt" ] && PACKAGES="$PACKAGES wazuh-agent"
-    # fi
+    COMMAND="wazuh-agent"
+    if grep -q -rnw "$files/" -e "$COMMAND" && ! command -v $COMMAND &>/dev/null; then
+        [ "$VERBOSE" = true ] && echo "$COMMAND required"
+        [ "$PACKMANAGER" = "apk" ] && PACKAGES="$PACKAGES wazuh-agent"
+        [ "$PACKMANAGER" = "apt" ] && PACKAGES="$PACKAGES wazuh-agent"
+    fi
 
 done
 

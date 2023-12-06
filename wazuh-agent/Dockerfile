@@ -1,4 +1,4 @@
-ARG BUILD_FROM
+ARG BUILD_FROM=ubuntu:focal
 FROM ${BUILD_FROM}
 
 SHELL ["/bin/bash", "-c"]
@@ -18,13 +18,13 @@ ARG CONFIG_LOCATION="/config/addons_config"
 ARG MODULES="00-banner.sh 01-custom_script.sh 00-global_var.sh"
 
 # Automatic modules download
-ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_automodules.sh" "/ha_automodules.sh"
-RUN chmod 744 /ha_automodules.sh && /ha_automodules.sh "$MODULES" && rm /ha_automodules.sh
+ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_install_modules.sh" "/ha_install_modules.sh"
+RUN chmod 744 /ha_install_modules.sh && /ha_install_modules.sh "$MODULES" && rm /ha_install_modules.sh
 
 # Manual apps
 ENV PACKAGES="curl gpg wget wazuh-agent"
 
-# Automatic apps & bashio
+# Install packages & bashio
 ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_autoapps.sh" "/ha_autoapps.sh"
 RUN chmod 744 /ha_autoapps.sh && /ha_autoapps.sh "$PACKAGES" && rm /ha_autoapps.sh
 
