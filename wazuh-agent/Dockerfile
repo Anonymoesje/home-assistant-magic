@@ -19,7 +19,7 @@ COPY rootfs/ /
 
 # Install missing packages
 ENV PACKAGES="curl"
-ADD "https://raw.githubusercontent.com/anonymoesje/home-assistant-magic/master/.scripts/ha_packages.sh" "/ha_packages.sh"
+ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha-packages.sh" "/ha_packages.sh"
 RUN chmod 744 /ha_packages.sh && /ha_packages.sh "$PACKAGES" && rm /ha_packages.sh
 
 # Version
