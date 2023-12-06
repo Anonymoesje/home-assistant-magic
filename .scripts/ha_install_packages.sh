@@ -33,8 +33,8 @@ fi
 
 
 # Check wazuh package known, if present.
-if command -v "apk" &>/dev/null && echo "$PACKAGES" | grep "wazuh-agent" >/dev/null; then
-     curl -O /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub
+if echo "$PACKAGES" | grep "wazuh-agent" >/dev/null; then
+     curl -s https://packages.wazuh.com/key/alpine-devel%40wazuh.com-633d7457.rsa.pub -o /etc/apk/keys/alpine-devel@wazuh.com-633d7457.rsa.pub
      echo "https://packages.wazuh.com/4.x/alpine/v3.12/main" >> /etc/apk/repositories
      apk update
 elif command -v "apt" &>/dev/null && echo "$PACKAGES" | grep "wazuh-agent" >/dev/null; then
