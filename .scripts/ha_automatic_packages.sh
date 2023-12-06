@@ -6,7 +6,7 @@ set -e
 ########
 
 #Verbose or not
-VERBOSE=false
+VERBOSE=true
 #Avoid fails on non declared variables
 set +u 2>/dev/null || true
 #If no packages, empty
@@ -17,13 +17,13 @@ PACKAGES="${*:-}"
 [ "$VERBOSE" = true ] && echo "ENV : $PACKAGES"
 
 # Prepare manager-base variable
-apkBased=$(command -v "apk")
-aptBased=$(command -v "apt")
-if [ -n "$apkBased" ]&>/dev/null; then
+apkBased=$(command -v "apk" &>/dev/null)
+aptBased=$(command -v "apt" &>/dev/null)
+if [ -n "$apkBased" ]; then
     # If apk based
     [ "$VERBOSE" = true ] && echo "apk based"
     PACKMANAGER="apk"
-elif [ -n "$aptBased" ]&>/dev/null; then
+elif [ -n "$aptBased" ]; then
     # If apt-get based
     [ "$VERBOSE" = true ] && echo "apt based"
     PACKMANAGER="apt"
