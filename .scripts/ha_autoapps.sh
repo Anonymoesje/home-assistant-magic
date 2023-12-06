@@ -25,4 +25,4 @@ fi
 #eval /./ha_automatic_packages.sh "${PACKAGES:-}"
 
 # Clean
-rm /ha_automatic_packages.sh
+#rm /ha_automatic_packages.sh
