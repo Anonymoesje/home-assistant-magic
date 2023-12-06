@@ -87,8 +87,6 @@ if [[ "$CONFIGSOURCE" == "/config"* ]]; then
 else
   bashio::log.green "If accessing the file with filebrowser it should be mapped to $CONFIGSOURCE"
 fi
-bashio::log.green "---------------------------------------------------------"
-bashio::log.green "Wiki here on how to use : github.com/alexbelgium/hassio-addons/wiki/Add‐ons-feature-:-add-env-variables"
 echo ""
 
 # Check if config file is there, or create one from template
