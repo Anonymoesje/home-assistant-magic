@@ -1,8 +1,8 @@
 #!/bin/sh
 # shellcheck disable=SC2015
 set -e
-# Auto resolve packages
 
+# Auto resolve packages
 PACKAGES="$1"
 echo "Packages : $PACKAGES"
 

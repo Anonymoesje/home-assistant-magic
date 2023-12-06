@@ -10,17 +10,21 @@ ENV \
     S6_CMD_WAIT_FOR_SERVICES=1 \
     S6_SERVICES_READYTIME=50
 
-# Set shell
-SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+COPY rootfs/ /
 
 ARG CONFIG_LOCATION="/config/addons_config"
 
-COPY rootfs/ /
+ARG MODULES="ha-banner.sh ha-custom-script.sh"
+
+# Download modules
+ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha_modules.sh" "/ha_modules.sh"
+RUN chmod 744 /ha-modules.sh && /ha-modules.sh "$MODULES" && rm /ha-modules.sh
 
 # Install missing packages
+ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha-packages.sh" "/ha-packages.sh"
+RUN chmod 744 /ha-packages.sh && /ha-packages.sh "$MODULES" && rm /ha-packages.sh
+
 ENV PACKAGES="curl"
-ADD "https://raw.githubusercontent.com/Anonymoesje/home-assistant-magic/main/.scripts/ha-packages.sh" "/ha_packages.sh"
-RUN chmod 744 /ha_packages.sh && /ha_packages.sh "$PACKAGES" && rm /ha_packages.sh
 
 # Version
 ARG \
